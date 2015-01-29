@@ -320,6 +320,15 @@ def test_dA(learning_rate=0.1, training_epochs=15,
         }
     )
 
+    test_da = theano.function(
+        [index],
+        cost,
+        givens={
+            x: train_set_x[index: index]
+        }
+    )
+
+
     start_time = time.clock()
 
     ############
@@ -342,6 +351,9 @@ def test_dA(learning_rate=0.1, training_epochs=15,
     print >> sys.stderr, ('The no corruption code for file ' +
                           os.path.split(__file__)[1] +
                           ' ran for %.2fm' % ((training_time) / 60.))
+
+    return test_da
+
     image = Image.fromarray(
         tile_raster_images(X=da.W.get_value(borrow=True).T,
                            img_shape=(28, 28), tile_shape=(10, 10),
