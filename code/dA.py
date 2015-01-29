@@ -324,7 +324,7 @@ def test_dA(learning_rate=0.1, training_epochs=15,
         [index],
         cost,
         givens={
-            x: train_set_x[index: index]
+            x: train_set_x[index: index + 1]
         }
     )
 
