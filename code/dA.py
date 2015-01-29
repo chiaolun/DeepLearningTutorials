@@ -230,6 +230,12 @@ class dA(object):
         """
         return T.nnet.sigmoid(T.dot(hidden, self.W_prime) + self.b_prime)
 
+    def get_errors(self):
+        y = self.get_hidden_values(self.x)
+        z = self.get_reconstructed_input(y)
+        L = - T.sum(self.x * T.log(z) + (1 - self.x) * T.log(1 - z), axis=1)
+        return L
+
     def get_cost_updates(self, corruption_level, learning_rate):
         """ This function computes the cost and the updates for one trainng
         step of the dA """
@@ -320,14 +326,15 @@ def test_dA(learning_rate=0.1, training_epochs=15,
         }
     )
 
-    test_da = theano.function(
-        [index],
-        cost,
+    error_vector = da.get_errors()
+
+    errors = theano.function(
+        [],
+        error_vector,
         givens={
-            x: train_set_x[index: index + 1]
+            x: train_set_x
         }
     )
-
 
     start_time = time.clock()
 
@@ -352,7 +359,7 @@ def test_dA(learning_rate=0.1, training_epochs=15,
                           os.path.split(__file__)[1] +
                           ' ran for %.2fm' % ((training_time) / 60.))
 
-    return test_da
+    return errors
 
     image = Image.fromarray(
         tile_raster_images(X=da.W.get_value(borrow=True).T,
